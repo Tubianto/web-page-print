@@ -59,24 +59,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun createWebPagePrint(webView:WebView) {
-        val printManager = getSystemService(Context.PRINT_SERVICE) as PrintManager
-        val jobName = getString(R.string.app_name) + " Document"
-        val printAdapter =  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            webView.createPrintDocumentAdapter(jobName)
-        } else {
-            webView.createPrintDocumentAdapter()
-        }
-        val builder = PrintAttributes.Builder()
-        builder.setMediaSize(PrintAttributes.MediaSize.ISO_A5)
-        val printJob = printManager.print(jobName, printAdapter, builder.build())
-        if (printJob.isCompleted) {
-            Toast.makeText(applicationContext, "Print Complete", Toast.LENGTH_LONG).show()
-        } else if (printJob.isFailed) {
-            Toast.makeText(applicationContext, "Print Failed", Toast.LENGTH_LONG).show()
-        }
-    }
-
     @SuppressLint("ServiceCast")
     fun isOnline(context: Context): Boolean {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -88,14 +70,6 @@ class MainActivity : AppCompatActivity() {
         webView.webViewClient = myWebclient()
         webView.settings.javaScriptEnabled = true
         webView.loadUrl(url)
-    }
-
-    fun clickClose(view: View) {
-        finish()
-    }
-
-    fun clickDownload(view: View) {
-        createWebPagePrint(webView)
     }
 
     inner class myWebclient: WebViewClient() {
@@ -116,5 +90,31 @@ class MainActivity : AppCompatActivity() {
             return true
         }
         return super.onKeyDown(keyCode, event)
+    }
+
+    fun clickClose(view: View) {
+        finish()
+    }
+
+    fun clickDownload(view: View) {
+        webPagePrint(webView)
+    }
+
+    private fun webPagePrint(webView:WebView) {
+        val printManager = getSystemService(Context.PRINT_SERVICE) as PrintManager
+        val jobName = getString(R.string.app_name) + " Document"
+        val printAdapter =  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            webView.createPrintDocumentAdapter(jobName)
+        } else {
+            webView.createPrintDocumentAdapter()
+        }
+        val builder = PrintAttributes.Builder()
+        builder.setMediaSize(PrintAttributes.MediaSize.ISO_A5)
+        val printJob = printManager.print(jobName, printAdapter, builder.build())
+        if (printJob.isCompleted) {
+            Toast.makeText(applicationContext, "Print Complete", Toast.LENGTH_LONG).show()
+        } else if (printJob.isFailed) {
+            Toast.makeText(applicationContext, "Print Failed", Toast.LENGTH_LONG).show()
+        }
     }
 }
